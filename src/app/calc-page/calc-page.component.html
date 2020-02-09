@@ -1,0 +1,6 @@
+<p>calc-page works!</p>
+<timepicker [(ngModel)]="myTime" 
+            [showMeridian]="isMeridian" 
+            [showSpinners]="showSpinners"></timepicker>
+<pre class="alert alert-info">Time is: {{myTime}}</pre>
+<button type="button" class="btn btn-danger" (click)="clear()">Clear</button>
