@@ -1,0 +1,30 @@
+
+<div class="wrapper">
+  <div class="inner-wrapper">
+    <div class="timepicker-wrapper">
+      <timepicker [(ngModel)]="myTime"
+                  [showMeridian]="isMeridian"
+                  [showSpinners]="showSpinners"></timepicker>
+    </div>
+
+    <div class="info-wrapper">
+      <div class="alert alert-secondary" role="alert"> Minutes past: {{ getMinutesFromTime(myTime) || 00 }}</div>
+      <div class="alert alert-secondary" role="alert"> Final bill:  {{ getPrice(myTime) || 00 }}</div>
+      <pre *ngIf="finalPrice" class="alert alert-info">Multiply bill: {{ finalPrice }}</pre>
+    </div>
+  </div>
+
+  <div class="multiply-buttons-wrapper">
+    <button type="button" class="btn btn-light multiply" (click)="multiply(2)">2</button>
+    <button type="button" class="btn btn-light multiply" (click)="multiply(3)">3</button>
+    <button type="button" class="btn btn-light multiply" (click)="multiply(4)">4</button>
+    <button type="button" class="btn btn-light multiply" (click)="multiply(5)">5</button>
+    <button type="button" class="btn btn-light multiply" (click)="multiply(6)">6</button>
+    <button type="button" class="btn btn-light multiply" (click)="multiply(7)">7</button>
+    <button type="button" class="btn btn-light multiply" (click)="multiply(8)">8</button>
+    <button type="button" class="btn btn-light multiply" (click)="multiply(9)">9</button>
+    <button type="button" class="btn btn-light multiply" (click)="multiply(10)">10</button>
+  </div>
+  <button type="button" class="btn btn-danger" (click)="clear()">Clear</button>
+
+</div>
