@@ -6,7 +6,7 @@ import { AppComponent } from './app.component';
 import { CalcPageComponent } from './calc-page/calc-page.component';
 
 import { TimepickerModule } from 'ngx-bootstrap/timepicker';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -15,6 +15,7 @@ import { FormsModule } from '@angular/forms';
   ],
   imports: [
     BrowserModule,
+    ReactiveFormsModule,
     AppRoutingModule,
     FormsModule,
     TimepickerModule.forRoot()
