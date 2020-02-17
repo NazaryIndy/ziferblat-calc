@@ -20,6 +20,8 @@ export class CalcPageComponent implements OnInit {
   finalPrice: number;
   diff: number;
   today = new Date();
+  Holidays = require('date-holidays');
+  hd = new this.Holidays()
 
   constructor() { }
 
@@ -54,6 +56,10 @@ export class CalcPageComponent implements OnInit {
     return weekday === 'Sunday' || weekday === 'Saturday';
   }
 
+  isHoliday(): boolean {
+    return this.hd.isHoliday(new Date());
+  }
+
   getPrice(time: Date): number {
     // console.log('GET PRICE')
     const newTime = moment(time, FORMAT);
@@ -63,8 +69,9 @@ export class CalcPageComponent implements OnInit {
     // console.log('NOW', now)
     // console.log('BEFORE', BEFORE_TIME)
      // TODO add condition it is weekend or holiday
+    // console.log('isHoliday', this.isHoliday());
 
-    if (this.isWeekend()) {
+    if (this.isWeekend() || this.isHoliday()) {
       const result = +diff * 3;
       return result >= 480 ? 480 : result;
     } else if (now.isBefore(BEFORE_TIME) && !this.isWeekend()) {
