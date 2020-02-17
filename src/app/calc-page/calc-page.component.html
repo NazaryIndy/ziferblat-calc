@@ -3,6 +3,7 @@
   <div class="inner-wrapper">
     <div class="timepicker-wrapper">
       <timepicker [(ngModel)]="myTime"
+                  (input)="onInput(myTime)"
                   [showMeridian]="isMeridian"
                   [showSpinners]="showSpinners"></timepicker>
     </div>
@@ -14,7 +15,7 @@
     </div>
   </div>
 
-  <div class="multiply-buttons-wrapper">
+  <!-- <div class="multiply-buttons-wrapper">
     <button type="button" class="btn btn-light multiply" (click)="multiply(2)">2</button>
     <button type="button" class="btn btn-light multiply" (click)="multiply(3)">3</button>
     <button type="button" class="btn btn-light multiply" (click)="multiply(4)">4</button>
@@ -24,7 +25,7 @@
     <button type="button" class="btn btn-light multiply" (click)="multiply(8)">8</button>
     <button type="button" class="btn btn-light multiply" (click)="multiply(9)">9</button>
     <button type="button" class="btn btn-light multiply" (click)="multiply(10)">10</button>
-  </div>
+  </div> -->
   <button type="button" class="btn btn-danger" (click)="clear()">Clear</button>
 
 </div>

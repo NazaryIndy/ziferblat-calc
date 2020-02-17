@@ -14,16 +14,29 @@ export class CalcPageComponent implements OnInit {
 
   isMeridian = false;
   showSpinners = false;
+
   myTime: Date;
+  price: number;
   finalPrice: number;
+  diff: number;
+  today = new Date();
 
   constructor() { }
 
   ngOnInit(): void {
+    // this.today.setHours(0, 0);
+    // this.myTime = this.today;
   }
 
   // TODO make update when something change
   // TODO add scenario when it is after 00:00 and after 03:00 and when working time till 03:00
+
+  onInput(event): void {
+    // console.log('event', event)
+    // console.log('myTime', this.myTime)
+    this.price = this.getPrice(event);
+    this.diff = this.getMinutesFromTime(event);
+  }
 
   clear(): void {
     this.myTime = void 0;
@@ -36,20 +49,33 @@ export class CalcPageComponent implements OnInit {
     return now.diff(newTime, 'minutes');
   }
 
+  isWeekend(): boolean {
+    const weekday = moment(this.today).format('dddd'); // Monday ... Sunday
+    return weekday === 'Sunday' || weekday === 'Saturday';
+  }
+
   getPrice(time: Date): number {
+    // console.log('GET PRICE')
     const newTime = moment(time, FORMAT);
-    const now = moment({}, FORMAT);
+    const now = moment(new Date(), FORMAT);
     const diff = this.getMinutesFromTime(time);
 
+    // console.log('NOW', now)
+    // console.log('BEFORE', BEFORE_TIME)
      // TODO add condition it is weekend or holiday
 
-    if (now.isBefore(BEFORE_TIME)) {
+    if (this.isWeekend()) {
+      const result = +diff * 3;
+      return result >= 480 ? 480 : result;
+    } else if (now.isBefore(BEFORE_TIME) && !this.isWeekend()) {
       const result = +diff * 2.5;
       return result >= 480 ? 480 : result;
-    } else if (newTime.isAfter(BEFORE_TIME)) {
+    } else if (newTime.isAfter(BEFORE_TIME) && !this.isWeekend()) {
       const result = +diff * 3;
       return result >= 480 ? 480 : result;
     } else {
+      // let timeBefore19 = ;
+      console.log('else')
       // TODO add condition if time before and after 19
     }
   }
