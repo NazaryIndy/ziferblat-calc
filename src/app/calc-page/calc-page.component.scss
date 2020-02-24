@@ -8,7 +8,7 @@
 }
 
 .inner-wrapper {
-  min-width: 250px;
+  min-width: 270px;
 }
 
 .title {
@@ -17,12 +17,20 @@
 
 .timepicker-wrapper {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   margin-bottom: 20px;
+  flex-direction: column;
+  align-items: center;
+  height: 100px;
 }
 
 .info-wrapper {
   margin-bottom: 20px;
+}
+
+.alert-wrapper {
+  display: flex;
+  justify-content: space-between;
 }
 
 .multiply-buttons-wrapper {
@@ -57,4 +65,14 @@
   -webkit-transform: rotate(-45deg);
   -moz-transform: rotate(-45deg);
   transform: rotate(-45deg);
+}
+
+.left {
+  width: 150px;
+  text-align: center;
+}
+
+.right {
+  text-align: center;
+  width: 100px;
 }

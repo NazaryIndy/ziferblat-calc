@@ -2,15 +2,29 @@
 <div class="wrapper">
   <div class="inner-wrapper">
     <div class="timepicker-wrapper">
-      <timepicker [(ngModel)]="myTime"
+      <timepicker [(ngModel)]="cameTime"
                   [showMeridian]="isMeridian"
                   [showSpinners]="showSpinners"></timepicker>
+      <button type="button" class="btn btn-info" (click)="calcPrice()">Calculate</button>
     </div>
-
     <div class="info-wrapper">
-      <div class="alert alert-secondary" role="alert"> Minutes past: {{ getMinutesFromTime(myTime) || 00 }}</div>
+      <div class="alert-wrapper">
+        <span class="alert alert-secondary left" role="alert"> Minutes past:</span>
+        <span class="alert alert-success right" role="alert">{{ minutesPast || 00 }}</span>
+      </div>
+      <div class="alert-wrapper">
+        <span class="alert alert-secondary left" role="alert"> Price:</span>
+        <span class="alert alert-success right" role="alert">{{ price || 00 }}</span>
+      </div>
+      <div *ngIf="finalPrice" class="alert-wrapper">
+        <pre class="alert alert-info left" role="alert">Final price:</pre>
+        <pre class="alert alert-info right" role="alert">{{ finalPrice }}</pre>
+      </div>
+
+     
+      <!-- <div class="alert alert-secondary" role="alert"> Minutes past: {{ getMinutesFromTime(myTime) || 00 }}</div>
       <div class="alert alert-secondary" role="alert"> Final bill:  {{ getPrice(myTime) || 00 }}</div>
-      <pre *ngIf="finalPrice" class="alert alert-info">Multiply bill: {{ finalPrice }}</pre>
+      <pre *ngIf="finalPrice" class="alert alert-info">Multiply bill: {{ finalPrice }}</pre> -->
     </div>
   </div>
 
