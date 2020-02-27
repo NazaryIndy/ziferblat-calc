@@ -16,12 +16,13 @@ export class CalcPageComponent implements OnInit {
   public showSpinners = false;
 
   public cameTime: Date;
+  public substractMinutes: string;
   public price: number;
   public finalPrice: number;
   public minutesPast: number;
   private today = new Date();
   private Holidays = require('date-holidays');
-  private hd = new this.Holidays()
+  private hd = new this.Holidays();
 
   constructor() { }
 
@@ -33,8 +34,6 @@ export class CalcPageComponent implements OnInit {
   // TODO make update when something change
 
 
-  // TODO add scenario when it is after 00:00 and after 03:00 and when working time till 03:00
-
   // onInput(event): void {
   //   // console.log('event', event)
   //   // console.log('myTime', this.myTime)
@@ -45,6 +44,7 @@ export class CalcPageComponent implements OnInit {
   public clear(): void {
     this.cameTime = void 0;
     this.finalPrice = null;
+    this.substractMinutes = null;
   }
 
   public calcPrice(): void {
@@ -54,7 +54,6 @@ export class CalcPageComponent implements OnInit {
   }
 
   private getMinutesFromTime(time: any): number {
-    // let now = moment(this.today, FORMAT);
     const now = moment();
     const cameTime = moment(time);
     const hoursNow = now.hours();
@@ -70,7 +69,7 @@ export class CalcPageComponent implements OnInit {
       const totalMinutesAfter = (hoursNow * 60 + minutesNow);
       return totalMinutesBefore + totalMinutesAfter;
     } else if (this.isAfterCloseWeekday(hoursNow, minutesNow)) {
-
+      // TODO and after 03:00 and when working time till 03:00
     }
   }
 
@@ -85,7 +84,7 @@ export class CalcPageComponent implements OnInit {
 
   private getPrice(time: Date): number {
     const cameTime = moment(time, FORMAT);
-    let now = moment(this.today, FORMAT);
+    const now = moment(this.today, FORMAT);
     const minutesPast = this.getMinutesFromTime(time);
 
     const hoursCame = cameTime.hours();
@@ -96,15 +95,17 @@ export class CalcPageComponent implements OnInit {
     if (!this.isAfterClose(hoursNow, minutesNow) && !this.isAfterCloseWeekday(hoursNow, minutesNow)) {
       if (this.isWeekend() || this.isHoliday() || cameTime.isAfter(CROSS_TIME)) {
         const result = +minutesPast * 3;
+
         return result >= 480 ? 480 : result;
       } else if (now.isBefore(CROSS_TIME) && !this.isWeekend() && !this.isHoliday()) {
         const result = +minutesPast * 2.5;
+
         return result >= 480 ? 480 : result;
       } else {
         const totalMinutesBefore = (19 - hoursCame) * 60 - minutesCame;
         const totalMinutesAfter = (hoursNow - 19) * 60 + minutesNow;
-  
         const result = totalMinutesBefore * 2.5 + totalMinutesAfter * 3;
+
         return result >= 480 ? 480 : result;
       }
     } else if (this.isAfterClose(hoursNow, minutesNow) && !this.isAfterCloseWeekday(hoursNow, minutesNow)) {
@@ -117,13 +118,14 @@ export class CalcPageComponent implements OnInit {
       priceBefore = priceBefore > 480 ? 480 : priceBefore;
       const totalMinutesAfter = (hoursNow * 60 + minutesNow);
       const priceAfter = totalMinutesAfter * 3;
+
       return priceBefore + priceAfter;
     } else if (this.isAfterCloseWeekday(hoursNow, minutesNow)) {
-      let totalMinutesBefore = ((24 - hoursCame) * 60 - minutesCame + 3 * 60);
+      const totalMinutesBefore = ((24 - hoursCame) * 60 - minutesCame + 3 * 60);
       let priceBefore = totalMinutesBefore * 3;
       priceBefore = priceBefore > 480 ? 480 : priceBefore;
       const totalMinutesAfter = ((hoursNow - 3) * 60 + minutesNow);
-      const priceAfter = totalMinutesAfter * 3;;
+      const priceAfter = totalMinutesAfter * 3;
       return priceBefore + priceAfter;
     }
   }
@@ -131,7 +133,7 @@ export class CalcPageComponent implements OnInit {
   private isAfterClose(hoursNow, minutesNow): boolean {
     if (((hoursNow === 0 && minutesNow !== 0) || hoursNow === 1 || hoursNow === 2 || hoursNow === 3) && !this.isWeekend()) {
       return true;
-    } 
+    }
     return false;
   }
 
@@ -142,10 +144,15 @@ export class CalcPageComponent implements OnInit {
     return false;
   }
 
-  public multiply(times: number): void {
-    this.finalPrice = times * this.getPrice(this.cameTime);
+  public multiply(times: number, price: number): void {
+    this.finalPrice = times * price;
   }
 
-    // TODO add opportunity to substract the minutes
+  public substract(minutes: string): void {
+    const newCameTime = moment(this.cameTime).add(minutes, 'minutes');
+    this.minutesPast = this.minutesPast - +minutes;
+
+    this.price = this.getPrice(newCameTime.toDate());
+  }
 
 }
