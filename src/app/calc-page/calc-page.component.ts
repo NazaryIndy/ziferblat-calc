@@ -56,24 +56,40 @@ export class CalcPageComponent implements OnInit {
   private getMinutesFromTime(time: any): number {
     const now = moment();
     const cameTime = moment(time);
-    const hoursNow = now.hours();
-    const minutesNow = now.minutes();
-    const hoursCame = cameTime.hours();
-    const minutesCame = cameTime.minutes();
+    let hoursNow = now.hours();
+    hoursNow = 3
+    let minutesNow = now.minutes();
+    minutesNow = 20
+    let hoursCame = cameTime.hours();
+    hoursCame = 22
+    let minutesCame = cameTime.minutes();
+    minutesCame = 10
 
     const newTime = moment(time);
-    if (!this.isAfterClose(hoursNow, minutesNow) && !this.isAfterCloseWeekday(hoursNow, minutesNow)) {
+    if (!this.isAfterClose(hoursNow, minutesNow) && !this.isWeekend()) {      
       return now.diff(newTime, 'minutes');
-    } else if (this.isAfterClose(hoursNow, minutesNow) && !this.isAfterCloseWeekday(hoursNow, minutesNow)) {
-      const totalMinutesBefore = ((24 - hoursCame) * 60 - minutesCame);
-      const totalMinutesAfter = (hoursNow * 60 + minutesNow);
+    } else if (this.isAfterClose(hoursNow, minutesNow)) {
+      const totalMinutesBefore = (24 - hoursCame) * 60 - minutesCame;
+      const totalMinutesAfter = hoursNow * 60 + minutesNow;
+      return totalMinutesBefore + totalMinutesAfter;
+    } else if (!this.isAfterCloseWeekday(hoursNow, minutesNow) && this.isWeekend()) {
+      if (hoursCame >= 0 && hoursCame < 3) {
+        return (hoursNow - hoursCame) * 60 + minutesNow - minutesCame;
+      }
+      const totalMinutesBefore = (24 - hoursCame) * 60 - minutesCame;
+      const totalMinutesAfter = hoursNow * 60 + minutesNow;
+
       return totalMinutesBefore + totalMinutesAfter;
     } else if (this.isAfterCloseWeekday(hoursNow, minutesNow)) {
-      // TODO and after 03:00 and when working time till 03:00
+      
+
+      console.log('4')
+      
     }
   }
 
   private isWeekend(): boolean {
+    return true;
     const weekday = moment(this.today).format('dddd');
     return weekday === 'Sunday' || weekday === 'Saturday';
   }
