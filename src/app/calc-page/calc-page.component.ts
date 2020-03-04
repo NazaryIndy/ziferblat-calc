@@ -160,8 +160,8 @@ export class CalcPageComponent {
 
   public substract(minutes: string): void {
     const newCameTime = moment(this.cameTime).add(minutes, 'minutes');
+    this.cameTime = new Date(newCameTime.format());    
     this.minutesPast = this.minutesPast - +minutes;
-
     this.price = this.getPrice(newCameTime.toDate());
   }
 
