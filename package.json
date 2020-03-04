@@ -8,7 +8,7 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "start": "http-server ./dist/ziferblat-calc --port 80"
+    "start": "http-server ./dist/ziferblat-calc"
   },
   "private": true,
   "heroku-postbuild": "ng build --prod",
