@@ -3,13 +3,15 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "serve": "ng serve",
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "start": "http-server ./dist/ziferblat-calc --port 80"
   },
   "private": true,
+  "heroku-postbuild": "ng build --prod",
   "dependencies": {
     "@angular/animations": "~9.0.0",
     "@angular/common": "~9.0.0",
@@ -20,6 +22,7 @@
     "@angular/platform-browser-dynamic": "~9.0.0",
     "@angular/router": "~9.0.0",
     "date-holidays": "^1.4.12",
+    "http-server": "^0.12.1",
     "moment": "^2.24.0",
     "ngx-bootstrap": "^5.3.2",
     "rxjs": "~6.5.4",
