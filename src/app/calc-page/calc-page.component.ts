@@ -24,13 +24,6 @@ export class CalcPageComponent {
   private Holidays = require('date-holidays');
   private hd = new this.Holidays();
 
-  // onInput(event): void {
-  //   // console.log('event', event)
-  //   // console.log('myTime', this.myTime)
-  //   this.price = this.getPrice(event);
-  //   this.minutesPast = this.getMinutesFromTime(event);
-  // }
-
   public clear(): void {
     this.cameTime = void 0;
     this.finalPrice = null;
