@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild, ElementRef } from '@angular/core';
 
 import * as moment from 'moment';
+import { IgxInputDirective } from 'igniteui-angular';
 
 const FORMAT = 'HH:mm:ss';
 const CROSS_TIME = moment('19:00:00', FORMAT);
@@ -12,10 +13,12 @@ const CROSS_TIME = moment('19:00:00', FORMAT);
 })
 export class CalcPageComponent {
 
+  @ViewChild('timepicker') tp: any;
+
   public isMeridian = false;
   public showSpinners = false;
 
-  public cameTime: Date;
+  public cameTime: Date = new Date();
   public substractMinutes: string;
   public price: number;
   public finalPrice: number;
@@ -23,6 +26,13 @@ export class CalcPageComponent {
   private today = new Date();
   private Holidays = require('date-holidays');
   private hd = new this.Holidays();
+
+  ngAfterViewInit() {
+    setTimeout(() => {
+      this.tp.input.nativeElement.focus();
+      this.tp.input.nativeElement.setSelectionRange(0,0);
+    }, 0);
+  }
 
   public clear(): void {
     this.cameTime = void 0;
@@ -33,9 +43,13 @@ export class CalcPageComponent {
   }
 
   public calcPrice(): void {
-    this.finalPrice = null;
-    this.price = this.getPrice(this.cameTime);
-    this.minutesPast = this.getMinutesFromTime(this.cameTime);
+    if (this.cameTime && this.cameTime.getTime() > this.today.getTime()) {
+      console.warn('You should enter time before now')
+    } else if (this.cameTime) {
+      this.finalPrice = null;
+      this.price = this.getPrice(this.cameTime);
+      this.minutesPast = this.getMinutesFromTime(this.cameTime);
+    }
   }
 
   private getMinutesFromTime(time: any): number {
@@ -47,7 +61,7 @@ export class CalcPageComponent {
     const minutesCame = cameTime.minutes();
     const newTime = moment(time);
 
-    if (!this.isAfterClose(hoursNow, minutesNow) && !this.isWeekend()) {      
+    if (!this.isAfterClose(hoursNow, minutesNow) && !this.isWeekend()) {
       return now.diff(newTime, 'minutes');
     } else if (this.isAfterClose(hoursNow, minutesNow)) {
       const totalMinutesBefore = (24 - hoursCame) * 60 - minutesCame;
@@ -69,9 +83,9 @@ export class CalcPageComponent {
       } else {
         const totalMinutesBefore = (24 - hoursCame) * 60 - minutesCame;
         const totalMinutesAfter = hoursNow * 60 + minutesNow;
-        todayMinutes = totalMinutesBefore + totalMinutesAfter;  
+        todayMinutes = totalMinutesBefore + totalMinutesAfter;
       }
-      
+
       return todayMinutes;
     }
   }
@@ -117,7 +131,7 @@ export class CalcPageComponent {
         priceBefore = priceBefore > 480 ? 480 : priceBefore;
         const totalMinutesAfter = (hoursNow - hoursCame) * 60 + minutesNow - minutesCame - totalMinutesBefore;
         const priceAfter = totalMinutesAfter * 3;
-     
+
         return priceBefore + priceAfter;
       } else {
         const totalMinutesBefore = (24 - hoursCame) * 60 - minutesCame + 3 * 60;
@@ -126,10 +140,10 @@ export class CalcPageComponent {
         const totalMinutesAfter = (hoursNow - 3) * 60 + minutesNow;
         const priceAfter = totalMinutesAfter * 3;
 
-        return priceBefore + priceAfter;     
+        return priceBefore + priceAfter;
       }
     }
-  }  
+  }
 
   private isWeekend(): boolean {
     const weekday = moment(this.today).format('dddd');
@@ -160,7 +174,7 @@ export class CalcPageComponent {
 
   public substract(minutes: string): void {
     const newCameTime = moment(this.cameTime).add(minutes, 'minutes');
-    this.cameTime = new Date(newCameTime.format());    
+    this.cameTime = new Date(newCameTime.format());
     this.minutesPast = this.minutesPast - +minutes;
     this.price = this.getPrice(newCameTime.toDate());
   }

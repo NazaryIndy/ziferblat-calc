@@ -2,10 +2,19 @@
 <div class="wrapper">
   <div class="inner-wrapper">
     <div class="timepicker-wrapper">
-      <timepicker [(ngModel)]="cameTime"
-                  [showMeridian]="isMeridian"
-                  [showSpinners]="showSpinners"></timepicker>
-      <button type="button" class="btn btn-info" (click)="calcPrice()">Calculate</button>
+      <div class="container">
+        <div class="group">
+            <igx-time-picker id="timepicker"
+                             format="HH:mm"
+                             mode="dropdown"
+                             openDialog="false"
+                             (input)="calcPrice()"
+                             includeLiterals="true"
+                             [(ngModel)]="cameTime"
+                             #timepicker>
+            </igx-time-picker>
+        </div>
+    </div>
     </div>
     <div class="info-wrapper">
       <div class="alert-wrapper">
@@ -15,18 +24,18 @@
       <div class="alert-wrapper">
         <div class="input-group mb-3">
           <input type="text"
-                 [(ngModel)]="substractMinutes" 
-                 class="form-control" 
-                 placeholder="Enter minutes" 
-                 aria-label="Enter minutes" 
+                 [(ngModel)]="substractMinutes"
+                 class="form-control"
+                 placeholder="Enter minutes"
+                 aria-label="Enter minutes"
                  aria-describedby="button-addon2">
           <div class="input-group-append">
-            <button class="btn btn-outline-secondary" 
-                    type="button" 
-                    id="button-addon2" 
+            <button class="btn btn-outline-secondary"
+                    type="button"
+                    id="button-addon2"
                     (click)="substract(substractMinutes)">Substract</button>
           </div>
-        </div>        
+        </div>
       </div>
       <div class="alert-wrapper">
         <span class="alert alert-secondary left" role="alert"> Price:</span>
