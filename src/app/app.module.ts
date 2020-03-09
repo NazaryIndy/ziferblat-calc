@@ -7,7 +7,7 @@ import { CalcPageComponent } from './calc-page/calc-page.component';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { HammerModule } from "@angular/platform-browser";
+import { HammerModule } from '@angular/platform-browser';
 import { IgxTimePickerModule } from 'igniteui-angular';
 
 @NgModule({

@@ -1,4 +1,4 @@
-import { Component, ViewChild, ElementRef } from '@angular/core';
+import { Component, ViewChild, AfterViewInit } from '@angular/core';
 
 import * as moment from 'moment';
 import { IgxInputDirective } from 'igniteui-angular';
@@ -11,7 +11,7 @@ const CROSS_TIME = moment('19:00:00', FORMAT);
   templateUrl: './calc-page.component.html',
   styleUrls: ['./calc-page.component.scss']
 })
-export class CalcPageComponent {
+export class CalcPageComponent implements AfterViewInit {
 
   @ViewChild('timepicker') tp: any;
 
@@ -30,7 +30,7 @@ export class CalcPageComponent {
   ngAfterViewInit() {
     setTimeout(() => {
       this.tp.input.nativeElement.focus();
-      this.tp.input.nativeElement.setSelectionRange(0,0);
+      this.tp.input.nativeElement.setSelectionRange(0, 0);
     }, 0);
   }
 
@@ -44,7 +44,7 @@ export class CalcPageComponent {
 
   public calcPrice(): void {
     if (this.cameTime && this.cameTime.getTime() > this.today.getTime()) {
-      console.warn('You should enter time before now')
+      console.warn('You should enter time before now');
     } else if (this.cameTime) {
       this.finalPrice = null;
       this.price = this.getPrice(this.cameTime);
