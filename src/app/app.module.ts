@@ -5,8 +5,10 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { CalcPageComponent } from './calc-page/calc-page.component';
 
-import { TimepickerModule } from 'ngx-bootstrap/timepicker';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { HammerModule } from "@angular/platform-browser";
+import { IgxTimePickerModule } from 'igniteui-angular';
 
 @NgModule({
   declarations: [
@@ -18,9 +20,12 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     ReactiveFormsModule,
     AppRoutingModule,
     FormsModule,
-    TimepickerModule.forRoot()
+    BrowserAnimationsModule,
+    HammerModule,
+    IgxTimePickerModule
   ],
   providers: [],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+}
