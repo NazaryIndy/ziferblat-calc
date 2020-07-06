@@ -3,16 +3,9 @@
   <div class="inner-wrapper">
     <div class="timepicker-wrapper">
       <div class="container">
-        <div class="group">
-            <igx-time-picker id="timepicker"
-                             format="HH:mm"
-                             mode="dropdown"
-                             openDialog="false"
-                             (input)="calcPrice()"
-                             includeLiterals="true"
-                             [(ngModel)]="cameTime"
-                             #timepicker>
-            </igx-time-picker>
+        <div class="group" [formGroup]="form">
+          <app-timepicker [controlInput]="form.get('startTime')" (changed)="calcPrice($event)" class="timepicker">
+          </app-timepicker>
         </div>
     </div>
     </div>

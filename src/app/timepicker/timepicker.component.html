@@ -1,0 +1,21 @@
+<form [formGroup]="form">
+  <div class="form-group">
+    <input type="text"
+           [formControl]="form.get('hours')"
+           class="form-control"
+           mask="00"
+           (keyup)="checkInputHours(form.get('hours'));"
+           (blur)="checkOnEmptyValue(form.get('hours'));"
+           #hours>
+    <span class="separator">
+      :
+    </span>
+    <input type="text"
+           [formControl]="form.get('minutes')"
+           class="form-control"
+           mask="00"
+           (keyup)="checkInputMinutes(form.get('minutes'));"
+           (blur)="checkOnEmptyValue(form.get('minutes'));"
+           #minutes>
+  </div>
+</form>

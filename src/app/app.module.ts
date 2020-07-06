@@ -8,12 +8,13 @@ import { CalcPageComponent } from './calc-page/calc-page.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HammerModule } from '@angular/platform-browser';
-import { IgxTimePickerModule } from 'igniteui-angular';
+import { TimepickerComponent } from './timepicker/timepicker.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    CalcPageComponent
+    CalcPageComponent,
+    TimepickerComponent
   ],
   imports: [
     BrowserModule,
@@ -22,7 +23,6 @@ import { IgxTimePickerModule } from 'igniteui-angular';
     FormsModule,
     BrowserAnimationsModule,
     HammerModule,
-    IgxTimePickerModule
   ],
   providers: [],
   bootstrap: [AppComponent]
