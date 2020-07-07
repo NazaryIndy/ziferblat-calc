@@ -4,6 +4,7 @@
            [formControl]="form.get('hours')"
            class="form-control"
            mask="00"
+           placeholder="00"
            (keyup)="checkInputHours(form.get('hours'));"
            (blur)="checkOnEmptyValue(form.get('hours'));"
            #hours>
@@ -14,6 +15,7 @@
            [formControl]="form.get('minutes')"
            class="form-control"
            mask="00"
+           placeholder="00"
            (keyup)="checkInputMinutes(form.get('minutes'));"
            (blur)="checkOnEmptyValue(form.get('minutes'));"
            #minutes>
