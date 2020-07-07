@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 
 import * as moment from 'moment';
-import { FormGroup, FormBuilder } from '@angular/forms';
+import { FormGroup } from '@angular/forms';
+import { TimepickerComponent } from '../timepicker/timepicker.component';
 
 const FORMAT = 'HH:mm:ss';
 const CROSS_TIME = moment('19:00:00', FORMAT);
@@ -11,7 +12,9 @@ const CROSS_TIME = moment('19:00:00', FORMAT);
   templateUrl: './calc-page.component.html',
   styleUrls: ['./calc-page.component.scss']
 })
-export class CalcPageComponent implements OnInit {
+export class CalcPageComponent {
+
+  @ViewChild('tp') tp: TimepickerComponent;
 
   public form: FormGroup;
 
@@ -26,24 +29,13 @@ export class CalcPageComponent implements OnInit {
   private Holidays = require('date-holidays');
   private hd = new this.Holidays();
 
-  constructor(private fb: FormBuilder) {}
-
-  ngOnInit() {
-    this.generateForm();
-  }
-
-  public generateForm(): void {
-    this.form = this.fb.group({
-      startTime: 0,
-    });
-  }
-
   public clear(): void {
     this.cameTime = void 0;
     this.finalPrice = null;
     this.price = null;
     this.minutesPast = null;
     this.substractMinutes = null;
+    this.tp.buildForm();
   }
 
   private formatDayMonth(number: string): string {

@@ -3,8 +3,8 @@
   <div class="inner-wrapper">
     <div class="timepicker-wrapper">
       <div class="container">
-        <div class="group" [formGroup]="form">
-          <app-timepicker (changed)="calcPrice($event)" class="timepicker">
+        <div class="group">
+          <app-timepicker (changed)="calcPrice($event)" class="timepicker" #tp>
           </app-timepicker>
         </div>
     </div>

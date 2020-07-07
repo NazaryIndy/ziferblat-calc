@@ -29,7 +29,7 @@ export class TimepickerComponent implements OnInit {
     }, 0);
   }
 
-  private buildForm(): void {
+  public buildForm(): void {
     this.form = this.fb.group({
       hours: [''],
       minutes: ['']
