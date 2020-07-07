@@ -16,7 +16,7 @@
            class="form-control"
            mask="00"
            placeholder="00"
-           (keyup)="checkInputMinutes(form.get('minutes'));"
+           (keyup)="checkInputMinutes(form.get('minutes'), $event);"
            (blur)="checkOnEmptyValue(form.get('minutes'));"
            #minutes>
   </div>

@@ -36,10 +36,6 @@ export class TimepickerComponent implements OnInit {
     });
   }
 
-  private sendData(): void {
-    this.changed.emit(this.form.value);
-  }
-
   public checkInputHours(control: AbstractControl): void {
     if (control.value.length === 2) {
       this.minutesInput.nativeElement.setSelectionRange(0, 0);
@@ -48,7 +44,7 @@ export class TimepickerComponent implements OnInit {
     if (control.value >= 24) {
       control.setValue(24);
     }
-    this.sendData();
+    this.changed.emit(this.form.value);
   }
 
   public checkOnEmptyValue(control: AbstractControl): void {
@@ -61,7 +57,7 @@ export class TimepickerComponent implements OnInit {
     }
   }
 
-  public checkInputMinutes(control: AbstractControl): void {
+  public checkInputMinutes(control: AbstractControl, event: KeyboardEvent): void {
     if (control.value > 59) {
       control.patchValue(59);
     } else {
@@ -69,7 +65,11 @@ export class TimepickerComponent implements OnInit {
         control.setValue('00');
       }
     }
-    this.sendData();
+    this.changed.emit(this.form.value);
+
+    if (event.keyCode === 8 && this.form.get('minutes').value.length === 0) {
+      this.hoursInput.nativeElement.focus();
+    }
   }
 
 }
