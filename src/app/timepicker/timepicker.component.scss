@@ -1,0 +1,22 @@
+form {
+
+  .form-group {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-width: 75px;
+    margin: 0;
+
+    .form-control {
+      width: 48%;
+      margin: 0;
+    }
+
+    span {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0 4px;
+    }
+  }
+}

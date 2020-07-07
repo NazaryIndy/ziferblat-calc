@@ -1,7 +1,7 @@
-import { Component, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 import * as moment from 'moment';
-import { IgxInputDirective } from 'igniteui-angular';
+import { FormGroup, FormBuilder } from '@angular/forms';
 
 const FORMAT = 'HH:mm:ss';
 const CROSS_TIME = moment('19:00:00', FORMAT);
@@ -11,14 +11,13 @@ const CROSS_TIME = moment('19:00:00', FORMAT);
   templateUrl: './calc-page.component.html',
   styleUrls: ['./calc-page.component.scss']
 })
-export class CalcPageComponent implements AfterViewInit {
+export class CalcPageComponent implements OnInit {
 
-  @ViewChild('timepicker') tp: any;
+  public form: FormGroup;
 
   public isMeridian = false;
   public showSpinners = false;
-
-  public cameTime: Date = new Date();
+  public cameTime: Date;
   public substractMinutes: string;
   public price: number;
   public finalPrice: number;
@@ -27,11 +26,16 @@ export class CalcPageComponent implements AfterViewInit {
   private Holidays = require('date-holidays');
   private hd = new this.Holidays();
 
-  ngAfterViewInit() {
-    setTimeout(() => {
-      this.tp.input.nativeElement.focus();
-      this.tp.input.nativeElement.setSelectionRange(0, 0);
-    }, 0);
+  constructor(private fb: FormBuilder) {}
+
+  ngOnInit() {
+    this.generateForm();
+  }
+
+  public generateForm(): void {
+    this.form = this.fb.group({
+      startTime: 0,
+    });
   }
 
   public clear(): void {
@@ -42,7 +46,20 @@ export class CalcPageComponent implements AfterViewInit {
     this.substractMinutes = null;
   }
 
-  public calcPrice(): void {
+  private formatDayMonth(number: string): string {
+    if (number.length === 1) {
+      return 0 + number;
+    }
+    return number;
+  }
+
+  public calcPrice(time): void {
+    const day = this.formatDayMonth(this.today.getDate().toString());
+    const month = this.formatDayMonth((this.today.getMonth() + 1).toString());
+    const year = this.today.getFullYear().toString();
+
+    this.cameTime = new Date(`${year}-${month}-${day}T${time.hours}:${time.minutes}:00+0300`);
+
     if (this.cameTime && this.cameTime.getTime() > this.today.getTime()) {
       console.warn('You should enter time before now');
     } else if (this.cameTime) {

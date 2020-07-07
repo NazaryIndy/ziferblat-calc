@@ -3,23 +3,16 @@
   <div class="inner-wrapper">
     <div class="timepicker-wrapper">
       <div class="container">
-        <div class="group">
-            <igx-time-picker id="timepicker"
-                             format="HH:mm"
-                             mode="dropdown"
-                             openDialog="false"
-                             (input)="calcPrice()"
-                             includeLiterals="true"
-                             [(ngModel)]="cameTime"
-                             #timepicker>
-            </igx-time-picker>
+        <div class="group" [formGroup]="form">
+          <app-timepicker (changed)="calcPrice($event)" class="timepicker">
+          </app-timepicker>
         </div>
     </div>
     </div>
     <div class="info-wrapper">
       <div class="alert-wrapper">
         <span class="alert alert-secondary left" role="alert"> Minutes past:</span>
-        <span class="alert alert-success right" role="alert">{{ minutesPast || 00 }}</span>
+        <span class="alert alert-success right" role="alert">{{ minutesPast || "00" }}</span>
       </div>
       <div class="alert-wrapper">
         <div class="input-group mb-3">
@@ -39,7 +32,7 @@
       </div>
       <div class="alert-wrapper">
         <span class="alert alert-secondary left" role="alert"> Price:</span>
-        <span class="alert alert-success right" role="alert">{{ price || 00 }}</span>
+        <span class="alert alert-success right" role="alert">{{ price || "00" }}</span>
       </div>
       <div *ngIf="finalPrice" class="alert-wrapper">
         <pre class="alert alert-info left" role="alert">Final price:</pre>
