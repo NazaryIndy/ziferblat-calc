@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { FormControl, FormGroup, FormBuilder, AbstractControl } from '@angular/forms';
 
 @Component({
@@ -6,7 +6,7 @@ import { FormControl, FormGroup, FormBuilder, AbstractControl } from '@angular/f
   templateUrl: './timepicker.component.html',
   styleUrls: ['./timepicker.component.scss']
 })
-export class TimepickerComponent implements OnInit {
+export class TimepickerComponent implements OnInit, AfterViewInit {
 
   @ViewChild('hours') hoursInput: ElementRef;
   @ViewChild('minutes') minutesInput: ElementRef;
@@ -29,15 +29,11 @@ export class TimepickerComponent implements OnInit {
     }, 0);
   }
 
-  private buildForm(): void {
+  public buildForm(): void {
     this.form = this.fb.group({
       hours: [''],
       minutes: ['']
     });
-  }
-
-  private sendData(): void {
-    this.changed.emit(this.form.value);
   }
 
   public checkInputHours(control: AbstractControl): void {
@@ -48,7 +44,7 @@ export class TimepickerComponent implements OnInit {
     if (control.value >= 24) {
       control.setValue(24);
     }
-    this.sendData();
+    this.changed.emit(this.form.value);
   }
 
   public checkOnEmptyValue(control: AbstractControl): void {
@@ -61,7 +57,7 @@ export class TimepickerComponent implements OnInit {
     }
   }
 
-  public checkInputMinutes(control: AbstractControl): void {
+  public checkInputMinutes(control: AbstractControl, event: KeyboardEvent): void {
     if (control.value > 59) {
       control.patchValue(59);
     } else {
@@ -69,7 +65,11 @@ export class TimepickerComponent implements OnInit {
         control.setValue('00');
       }
     }
-    this.sendData();
+    this.changed.emit(this.form.value);
+
+    if (event.key === 'Backspace' && this.form.get('minutes').value.length === 0) {
+      this.hoursInput.nativeElement.focus();
+    }
   }
 
 }
