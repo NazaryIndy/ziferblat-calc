@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { FormControl, FormGroup, FormBuilder, AbstractControl } from '@angular/forms';
 
 @Component({
@@ -6,7 +6,7 @@ import { FormControl, FormGroup, FormBuilder, AbstractControl } from '@angular/f
   templateUrl: './timepicker.component.html',
   styleUrls: ['./timepicker.component.scss']
 })
-export class TimepickerComponent implements OnInit {
+export class TimepickerComponent implements OnInit, AfterViewInit {
 
   @ViewChild('hours') hoursInput: ElementRef;
   @ViewChild('minutes') minutesInput: ElementRef;
@@ -67,7 +67,7 @@ export class TimepickerComponent implements OnInit {
     }
     this.changed.emit(this.form.value);
 
-    if (event.keyCode === 8 && this.form.get('minutes').value.length === 0) {
+    if (event.key === 'Backspace' && this.form.get('minutes').value.length === 0) {
       this.hoursInput.nativeElement.focus();
     }
   }

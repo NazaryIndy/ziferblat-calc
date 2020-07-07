@@ -38,11 +38,11 @@ export class CalcPageComponent {
     this.tp.buildForm();
   }
 
-  private formatDayMonth(number: string): string {
-    if (number.length === 1) {
-      return 0 + number;
+  private formatDayMonth(value: string): string {
+    if (value.length === 1) {
+      return 0 + value;
     }
-    return number;
+    return value;
   }
 
   public calcPrice(time): void {
