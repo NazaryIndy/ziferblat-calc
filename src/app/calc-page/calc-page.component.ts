@@ -50,7 +50,7 @@ export class CalcPageComponent {
     const month = this.formatDayMonth((this.today.getMonth() + 1).toString());
     const year = this.today.getFullYear().toString();
 
-    this.cameTime = new Date(`${year}-${month}-${day}T${time.hours}:${time.minutes}:00+0300`);
+    this.cameTime = new Date(`${year}-${month}-${day}T${time.hours}:${time.minutes}:00+03:00`);
 
     if (this.cameTime && this.cameTime.getTime() > this.today.getTime()) {
       console.warn('You should enter time before now');
