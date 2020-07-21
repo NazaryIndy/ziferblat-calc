@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, ɵConsole } from '@angular/core';
 
 import * as moment from 'moment';
 import { FormGroup } from '@angular/forms';
@@ -57,7 +57,7 @@ export class CalcPageComponent {
     } else if (this.cameTime) {
       this.finalPrice = null;
       this.price = this.getPrice(this.cameTime);
-      this.minutesPast = this.getMinutesFromTime(this.cameTime);
+      this.minutesPast = this.getMinutesFromTime(this.cameTime) > 180 ? 180 : this.getMinutesFromTime(this.cameTime);
     }
   }
 
@@ -71,12 +71,12 @@ export class CalcPageComponent {
     const newTime = moment(time);
 
     if (!this.isAfterClose(hoursNow, minutesNow) && !this.isWeekend()) {
-      return now.diff(newTime, 'minutes');
+      return now.diff(newTime, 'minutes') > 180 ? 180 : now.diff(newTime, 'minutes');
     } else if (this.isAfterClose(hoursNow, minutesNow)) {
       const totalMinutesBefore = (24 - hoursCame) * 60 - minutesCame;
       const totalMinutesAfter = hoursNow * 60 + minutesNow;
 
-      return totalMinutesBefore + totalMinutesAfter;
+      return totalMinutesBefore + totalMinutesAfter > 180 ? 180 : totalMinutesBefore + totalMinutesAfter;
     } else if (!this.isAfterCloseWeekday(hoursNow, minutesNow) && this.isWeekend()) {
       if (hoursCame >= 0 && hoursCame < 3) {
         return (hoursNow - hoursCame) * 60 + minutesNow - minutesCame;
@@ -84,7 +84,7 @@ export class CalcPageComponent {
       const totalMinutesBefore = (24 - hoursCame) * 60 - minutesCame;
       const totalMinutesAfter = hoursNow * 60 + minutesNow;
 
-      return totalMinutesBefore + totalMinutesAfter;
+      return totalMinutesBefore + totalMinutesAfter > 180 ? 180 : totalMinutesBefore + totalMinutesAfter;
     } else if (this.isAfterCloseWeekday(hoursNow, minutesNow)) {
       let todayMinutes: number;
       if (hoursCame >= 0 && hoursCame < 3) {
@@ -95,14 +95,15 @@ export class CalcPageComponent {
         todayMinutes = totalMinutesBefore + totalMinutesAfter;
       }
 
-      return todayMinutes;
+      return todayMinutes > 180 ? 180 : todayMinutes;
     }
   }
 
   private getPrice(time: Date): number {
+    this.today = new Date();
     const cameTime = moment(time, FORMAT);
     const now = moment(this.today, FORMAT);
-    const minutesPast = this.getMinutesFromTime(time);
+    const minutesPast = this.getMinutesFromTime(time) > 180 ? 180 : this.getMinutesFromTime(time);
 
     const hoursCame = cameTime.hours();
     const minutesCame = cameTime.minutes();
