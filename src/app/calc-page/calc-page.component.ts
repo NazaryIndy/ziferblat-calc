@@ -1,4 +1,4 @@
-import { Component, ViewChild, ɵConsole, ElementRef } from '@angular/core';
+import { Component, ViewChild, ElementRef } from '@angular/core';
 
 import * as moment from 'moment';
 import { FormGroup } from '@angular/forms';
@@ -185,7 +185,7 @@ export class CalcPageComponent {
 
   public subtract(minutes: string): void {
     const minutesPast = this.getMinutesFromTime(this.cameTime);
-    let newCameTime;
+    let newCameTime: any;
 
     if (minutesPast >= 180) {
       newCameTime = moment(this.today).subtract(180, 'minutes');
