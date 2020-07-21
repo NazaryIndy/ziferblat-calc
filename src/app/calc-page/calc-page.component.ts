@@ -1,4 +1,4 @@
-import { Component, ViewChild, ɵConsole } from '@angular/core';
+import { Component, ViewChild, ɵConsole, ElementRef } from '@angular/core';
 
 import * as moment from 'moment';
 import { FormGroup } from '@angular/forms';
@@ -15,13 +15,14 @@ const CROSS_TIME = moment('19:00:00', FORMAT);
 export class CalcPageComponent {
 
   @ViewChild('tp') tp: TimepickerComponent;
+  @ViewChild('subMinutes') sm: ElementRef;
 
   public form: FormGroup;
 
   public isMeridian = false;
   public showSpinners = false;
   public cameTime: Date;
-  public substractMinutes: string;
+  public subtractMinutes: string;
   public price: number;
   public finalPrice: number;
   public minutesPast: number;
@@ -34,7 +35,7 @@ export class CalcPageComponent {
     this.finalPrice = null;
     this.price = null;
     this.minutesPast = null;
-    this.substractMinutes = null;
+    this.subtractMinutes = null;
     this.tp.buildForm();
   }
 
@@ -182,20 +183,24 @@ export class CalcPageComponent {
     this.finalPrice = times * price;
   }
 
-  public substract(minutes: string): void {
+  public subtract(minutes: string): void {
     const minutesPast = this.getMinutesFromTime(this.cameTime);
+    let newCameTime;
+
     if (minutesPast >= 180) {
-      let newCameTime = moment(this.today).subtract(180, 'minutes');
+      newCameTime = moment(this.today).subtract(180, 'minutes');
       newCameTime = moment(newCameTime).add(minutes, 'minutes');
-      this.cameTime = new Date(newCameTime.format());
-      this.minutesPast = this.minutesPast - +minutes;
-      this.price = this.getPrice(newCameTime.toDate());
     } else {
-      const newCameTime = moment(this.cameTime).add(minutes, 'minutes');
-      this.cameTime = new Date(newCameTime.format());
-      this.minutesPast = this.minutesPast - +minutes;
-      this.price = this.getPrice(newCameTime.toDate());
+      newCameTime = moment(this.cameTime).add(minutes, 'minutes');
     }
+
+    this.cameTime = new Date(newCameTime.format());
+    this.minutesPast = this.minutesPast - +minutes;
+    this.price = this.getPrice(newCameTime.toDate());
+  }
+
+  public clearInput(): void {
+    this.sm.nativeElement.value = '';
   }
 
 }

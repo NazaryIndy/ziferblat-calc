@@ -37,7 +37,7 @@ export class TimepickerComponent implements OnInit, AfterViewInit {
   }
 
   public checkInputHours(control: AbstractControl): void {
-    if (control.value.length === 2) {
+    if (control.value.toString().length === 2) {
       this.minutesInput.nativeElement.setSelectionRange(0, 0);
       this.minutesInput.nativeElement.focus();
     }

@@ -17,8 +17,10 @@
       <div class="alert-wrapper">
         <div class="input-group mb-3">
           <input type="text"
-                 [(ngModel)]="substractMinutes"
+                 [(ngModel)]="subtractMinutes"
+                 #subMinutes
                  class="form-control"
+                 (blur)="clearInput()"
                  placeholder="Enter minutes"
                  aria-label="Enter minutes"
                  aria-describedby="button-addon2">
@@ -26,7 +28,7 @@
             <button class="btn btn-outline-secondary"
                     type="button"
                     id="button-addon2"
-                    (click)="substract(substractMinutes)">Substract</button>
+                    (click)="subtract(subtractMinutes)">Substract</button>
           </div>
         </div>
       </div>
