@@ -119,18 +119,20 @@ export class CalcPageComponent {
       } else if (now.isBefore(CROSS_TIME) && !this.isWeekend() && !this.isHoliday()) {
         const result = +minutesPast * 2.5;
 
-        return result >= 480 ? 480 : result;
+        return result >= 450 ? 480 : result;
       } else {
         const totalMinutesBefore = (19 - hoursCame) * 60 - minutesCame;
         const totalMinutesAfter = (hoursNow - 19) * 60 + minutesNow;
         const result = totalMinutesBefore * 2.5 + totalMinutesAfter * 3;
-
+        if (totalMinutesBefore + totalMinutesAfter >= 180) {
+          return 480;
+        }
         return result >= 480 ? 480 : result;
       }
     } else if (this.isAfterClose(hoursNow, minutesNow) && !this.isAfterCloseWeekday(hoursNow, minutesNow)) {
       const totalMinutesBefore = ((24 - hoursCame) * 60 - minutesCame);
       let priceBefore = totalMinutesBefore * 3;
-      priceBefore = priceBefore > 480 ? 480 : priceBefore;
+      priceBefore = priceBefore >= 480 ? 480 : priceBefore;
       const totalMinutesAfter = (hoursNow * 60 + minutesNow);
       const priceAfter = totalMinutesAfter * 3;
 
@@ -139,7 +141,7 @@ export class CalcPageComponent {
       if (hoursCame >= 0 && hoursCame < 3) {
         const totalMinutesBefore = (3 - hoursCame) * 60 + minutesNow - minutesCame;
         let priceBefore = totalMinutesBefore * 3;
-        priceBefore = priceBefore > 480 ? 480 : priceBefore;
+        priceBefore = priceBefore >= 480 ? 480 : priceBefore;
         const totalMinutesAfter = (hoursNow - hoursCame) * 60 + minutesNow - minutesCame - totalMinutesBefore;
         const priceAfter = totalMinutesAfter * 3;
 
@@ -147,7 +149,7 @@ export class CalcPageComponent {
       } else {
         const totalMinutesBefore = (24 - hoursCame) * 60 - minutesCame + 3 * 60;
         let priceBefore = totalMinutesBefore * 3;
-        priceBefore = priceBefore > 480 ? 480 : priceBefore;
+        priceBefore = priceBefore >= 480 ? 480 : priceBefore;
         const totalMinutesAfter = (hoursNow - 3) * 60 + minutesNow;
         const priceAfter = totalMinutesAfter * 3;
 
