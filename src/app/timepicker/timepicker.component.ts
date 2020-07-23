@@ -37,7 +37,7 @@ export class TimepickerComponent implements OnInit, AfterViewInit {
   }
 
   public checkInputHours(control: AbstractControl): void {
-    if (control.value.toString().length === 2) {
+    if (control.value.length === 2) {
       this.minutesInput.nativeElement.setSelectionRange(0, 0);
       this.minutesInput.nativeElement.focus();
     }
@@ -67,9 +67,9 @@ export class TimepickerComponent implements OnInit, AfterViewInit {
     }
     this.changed.emit(this.form.value);
 
-    if (event.key === 'Backspace' && this.form.get('minutes').value.length === 0) {
-      this.hoursInput.nativeElement.focus();
-    }
+    // if (event.key === 'Backspace' && this.form.get('minutes').value.length === 0) {
+    //   this.hoursInput.nativeElement.focus();
+    // }
   }
 
 }
