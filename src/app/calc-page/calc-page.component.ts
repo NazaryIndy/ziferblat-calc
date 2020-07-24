@@ -28,6 +28,7 @@ export class CalcPageComponent {
   public minutesPast: number;
   public newMinutesPast: number;
   private today = new Date();
+  // private today = new Date('Fri Jul 24 2020 22:00:00 GMT+0300');
   private Holidays = require('date-holidays');
   private hd = new this.Holidays();
 
@@ -102,6 +103,7 @@ export class CalcPageComponent {
 
   private getMinutesFromTime(time: any): number {
     const now = moment();
+    // const now = moment(this.today);
     this.makeDataForMinutes(time, now);
 
     if (!this.isAfterClose(this.hoursNowG, this.minutesNowG) && !this.isWeekend()) {
@@ -136,7 +138,7 @@ export class CalcPageComponent {
 
   private getPrice(time: Date): number {
     this.today = new Date();
-
+    // this.today = new Date('Fri Jul 24 2020 22:00:00 GMT+0300');
     this.makeDataForPrice(time);
 
     if (!this.isAfterClose(this.hoursNowP, this.minutesNowP) && !this.isAfterCloseWeekday(this.hoursNowP, this.minutesNowP)) {
@@ -210,22 +212,6 @@ export class CalcPageComponent {
     this.finalPrice = times * price;
   }
 
-  public subtract1(minutes: string): void {
-    const minutesPast = this.getMinutesFromTime(this.cameTime);
-    let newCameTime: any;
-
-    if (minutesPast >= 180) {
-      newCameTime = moment(this.today).subtract(180, 'minutes');
-      newCameTime = moment(newCameTime).add(minutes, 'minutes');
-    } else {
-      newCameTime = moment(this.cameTime).add(minutes, 'minutes');
-    }
-
-    this.cameTime = new Date(newCameTime.format());
-    this.minutesPast = this.minutesPast - +minutes;
-    this.price = this.getPrice(newCameTime.toDate());
-  }
-
   public clearInput(): void {
     this.sm.nativeElement.value = '';
   }
@@ -238,52 +224,82 @@ export class CalcPageComponent {
       if (this.isWeekend() || this.isHoliday() || this.cameTimeP.isAfter(CROSS_TIME)) {
         const result = +minutesPast * 3;
         if (result > 480) {
-          const difference = (result - 480) / 3;
-          newCameTime = this.makeNewCameTime(difference);
-          newCameTime = moment(newCameTime).add(minutes, 'minutes');
-        }
-      } else if (this.nowP.isBefore(CROSS_TIME) && !this.isWeekend() && !this.isHoliday()) {
-        const result = +minutesPast * 2.5;
-        console.log('result', result)
-        if (result > 480) {
-          console.log('NOOOO')
-          this.newMinutesPast = +minutesPast - ((result - 480)/ 2.5);
+          this.newMinutesPast = +minutesPast - ((result - 480) / 3);
           newCameTime = this.makeNewCameTime(this.newMinutesPast);
           newCameTime = moment(newCameTime).add(minutes, 'minutes');
         } else {
-          console.log('!!!!!!!!')
+          newCameTime = moment(this.cameTime).add(minutes, 'minutes');
+        }
+      } else if (this.nowP.isBefore(CROSS_TIME) && !this.isWeekend() && !this.isHoliday()) {
+        const result = +minutesPast * 2.5;
+        if (result > 480) {
+          this.newMinutesPast = +minutesPast - ((result - 480) / 2.5);
+          newCameTime = this.makeNewCameTime(this.newMinutesPast);
+          newCameTime = moment(newCameTime).add(minutes, 'minutes');
+        } else {
           newCameTime = moment(this.cameTime).add(minutes, 'minutes');
         }
       } else {
-        const totalMinutesBefore = (19 - this.hoursCameP) * 60 - this.minutesCameP;
-        const totalMinutesAfter = (this.hoursNowP - 19) * 60 + this.minutesNowP;
-        const result = totalMinutesBefore * 2.5 + totalMinutesAfter * 3;
+        let totalMinutesBefore = (19 - this.hoursCameP) * 60 - this.minutesCameP;
+        let totalMinutesAfter = (this.hoursNowP - 19) * 60 + this.minutesNowP;
+        let result = totalMinutesBefore * 2.5 + totalMinutesAfter * 3;
 
+        if (totalMinutesBefore * 2.5 > 480) {
+          totalMinutesBefore = totalMinutesBefore - ((totalMinutesBefore * 2.5 - 480) / 2.5);
+          this.newMinutesPast = totalMinutesBefore + totalMinutesAfter;
+        }
+        result = totalMinutesBefore * 2.5 + totalMinutesAfter * 3;
 
+        if (result > 480) {
+          if (totalMinutesAfter * 3 > 480) {
+            totalMinutesAfter = totalMinutesAfter - ((totalMinutesAfter * 3 - 480) / 3);
+            this.newMinutesPast = totalMinutesBefore + totalMinutesAfter;
+          }
+          result = totalMinutesBefore * 2.5 + totalMinutesAfter * 3;
+        }
+
+        if (result > 480) {
+          for (let res = result; result >= 480; res--) {
+            totalMinutesBefore = totalMinutesBefore - 1;
+            result = totalMinutesBefore * 2.5 + totalMinutesAfter * 3;
+            if (totalMinutesBefore <= 0) { break; }
+          }
+
+          if (result > 480) {
+            for (let res = result; result >= 480; res--) {
+              totalMinutesAfter = totalMinutesAfter - 1;
+              result = totalMinutesBefore * 2.5 + totalMinutesAfter * 3;
+              if (totalMinutesAfter <= 0) { break; }
+            }
+          }
+        }
+
+        this.newMinutesPast = totalMinutesBefore + totalMinutesAfter;
+        newCameTime = this.makeNewCameTime(this.newMinutesPast);
+        newCameTime = moment(newCameTime).add(minutes, 'minutes');
       }
     } else if (this.isAfterClose(this.hoursNowP, this.minutesNowP) && !this.isAfterCloseWeekday(this.hoursNowP, this.minutesNowP)) {
-      const totalMinutesBefore = ((24 - this.hoursCameP) * 60 - this.minutesCameP);
-      let priceBefore = totalMinutesBefore * 3;
-      const totalMinutesAfter = (this.hoursNowP * 60 + this.minutesNowP);
-      const priceAfter = totalMinutesAfter * 3;
+      // const totalMinutesBefore = ((24 - this.hoursCameP) * 60 - this.minutesCameP);
+      // let priceBefore = totalMinutesBefore * 3;
+      // const totalMinutesAfter = (this.hoursNowP * 60 + this.minutesNowP);
+      // const priceAfter = totalMinutesAfter * 3;
 
 
     } else if (this.isAfterCloseWeekday(this.hoursNowP, this.minutesNowP)) {
-      if (this.hoursCameP >= 0 && this.hoursCameP < 3) {
-        const totalMinutesBefore = (3 - this.hoursCameP) * 60 + this.minutesNowP - this.minutesCameP;
-        let priceBefore = totalMinutesBefore * 3;
+      // if (this.hoursCameP >= 0 && this.hoursCameP < 3) {
+      //   const totalMinutesBefore = (3 - this.hoursCameP) * 60 + this.minutesNowP - this.minutesCameP;
+      //   let priceBefore = totalMinutesBefore * 3;
 
-        const totalMinutesAfter = (this.hoursNowP - this.hoursCameP) * 60 + this.minutesNowP - this.minutesCameP - totalMinutesBefore;
-        const priceAfter = totalMinutesAfter * 3;
+      //   const totalMinutesAfter = (this.hoursNowP - this.hoursCameP) * 60 + this.minutesNowP - this.minutesCameP - totalMinutesBefore;
+      //   const priceAfter = totalMinutesAfter * 3;
 
-      } else {
-        const totalMinutesBefore = (24 - this.hoursCameP) * 60 - this.minutesCameP + 3 * 60;
-        let priceBefore = totalMinutesBefore * 3;
-        const totalMinutesAfter = (this.hoursNowP - 3) * 60 + this.minutesNowP;
-        const priceAfter = totalMinutesAfter * 3;
+      // } else {
+      //   const totalMinutesBefore = (24 - this.hoursCameP) * 60 - this.minutesCameP + 3 * 60;
+      //   let priceBefore = totalMinutesBefore * 3;
+      //   const totalMinutesAfter = (this.hoursNowP - 3) * 60 + this.minutesNowP;
+      //   const priceAfter = totalMinutesAfter * 3;
 
-
-      }
+      // }
     }
 
     this.cameTime = new Date(newCameTime.format());
