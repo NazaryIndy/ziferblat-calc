@@ -314,4 +314,8 @@ export class CalcPageComponent {
     return moment(this.today).subtract(substractMinutes, 'minutes').toDate();
   }
 
+  public round(number): number {
+    return Math.floor(number);
+  }
+
 }
