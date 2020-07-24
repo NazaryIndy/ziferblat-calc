@@ -11,11 +11,11 @@
     </div>
     <div class="info-wrapper">
       <div class="alert-wrapper">
-        <span class="alert alert-secondary left" role="alert"> Minutes past:</span>
+        <span class="alert alert-secondary left" role="alert"> Прошло минут:</span>
         <span class="alert alert-success right" role="alert">{{ minutesPast || "00" }}</span>
       </div>
       <div class="alert-wrapper" *ngIf="newMinutesPast">
-        <span class="alert alert-secondary left" role="alert"> Stop minutes:</span>
+        <span class="alert alert-secondary left" role="alert"> Со стоп чеком</span>
         <span class="alert alert-success right" role="alert">{{ newMinutesPast || "00" }}</span>
       </div>
       <div class="alert-wrapper">
@@ -25,23 +25,23 @@
                  #subMinutes
                  class="form-control"
                  (blur)="clearInput()"
-                 placeholder="Enter minutes"
+                 placeholder="Счастливые минутки"
                  aria-label="Enter minutes"
                  aria-describedby="button-addon2">
           <div class="input-group-append">
             <button class="btn btn-outline-secondary"
                     type="button"
                     id="button-addon2"
-                    (click)="subtract(subtractMinutes)">Substract</button>
+                    (click)="subtract(subtractMinutes)">Вычесть</button>
           </div>
         </div>
       </div>
       <div class="alert-wrapper">
-        <span class="alert alert-secondary left" role="alert"> Price:</span>
+        <span class="alert alert-secondary left" role="alert"> Оплатить:</span>
         <span class="alert alert-success right" role="alert">{{ price || "00" }}</span>
       </div>
       <div *ngIf="finalPrice" class="alert-wrapper">
-        <pre class="alert alert-info left" role="alert">Final price:</pre>
+        <pre class="alert alert-info left" role="alert">Оплатить за всех:</pre>
         <pre class="alert alert-info right" role="alert">{{ finalPrice }}</pre>
       </div>
     </div>
@@ -58,6 +58,6 @@
     <button type="button" class="btn btn-light multiply" (click)="multiply(9, price)">9</button>
     <button type="button" class="btn btn-light multiply" (click)="multiply(10, price)">10</button>
   </div>
-  <button type="button" class="btn btn-danger" (click)="clear()">Clear</button>
+  <button type="button" class="btn btn-danger" (click)="clear()">Очистить</button>
 
 </div>
