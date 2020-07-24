@@ -14,6 +14,10 @@
         <span class="alert alert-secondary left" role="alert"> Minutes past:</span>
         <span class="alert alert-success right" role="alert">{{ minutesPast || "00" }}</span>
       </div>
+      <div class="alert-wrapper" *ngIf="newMinutesPast">
+        <span class="alert alert-secondary left" role="alert"> Stop minutes:</span>
+        <span class="alert alert-success right" role="alert">{{ newMinutesPast || "00" }}</span>
+      </div>
       <div class="alert-wrapper">
         <div class="input-group mb-3">
           <input type="tel"
