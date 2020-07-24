@@ -57,7 +57,7 @@ export class TimepickerComponent implements OnInit, AfterViewInit {
     }
   }
 
-  public checkInputMinutes(control: AbstractControl, event: KeyboardEvent): void {
+  public checkInputMinutes(control: AbstractControl): void {
     if (control.value > 59) {
       control.patchValue(59);
     } else {
@@ -66,10 +66,12 @@ export class TimepickerComponent implements OnInit, AfterViewInit {
       }
     }
     this.changed.emit(this.form.value);
+  }
 
-    // if (event.key === 'Backspace' && this.form.get('minutes').value.length === 0) {
-    //   this.hoursInput.nativeElement.focus();
-    // }
+  public checkInput(event): void {
+    if (event.key === 'Backspace' && event.target.selectionStart === 0) {
+      this.hoursInput.nativeElement.focus();
+    }
   }
 
 }
