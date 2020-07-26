@@ -2,7 +2,7 @@ import { Component, ViewChild, ElementRef } from '@angular/core';
 
 import * as moment from 'moment';
 import { TimepickerComponent } from '../timepicker/timepicker.component';
-import { FORMAT, CROSS_TIME, MAX_PRICE } from '../constants/constants';
+import { FORMAT, CROSS_TIME, MAX_PRICE, PRICE, PRICE_WEEKEND } from '../constants/constants';
 import { IMinutesData, IPriceData, ITime } from '../models/data.interface';
 
 @Component({
@@ -23,6 +23,8 @@ export class CalcPageComponent {
   public minutesCounted: number;
 
   private today = new Date();
+  // private today = new Date('Sun Jul 26 2020 03:10:00 GMT+0300');
+  // private today = new Date('Mon Jul 27 2020 00:20:00 GMT+0300');
   // private today = new Date('Fri Jul 24 2020 22:00:00 GMT+0300');
   private Holidays = require('date-holidays');
   private hd = new this.Holidays();
@@ -32,7 +34,7 @@ export class CalcPageComponent {
 
   private makeDataForMinutes(time: Date): void {
     this.dataM.currentDate = moment();
-        // this.dataM.currentDate = moment(this.today);
+    // this.dataM.currentDate = moment(this.today);
     this.dataM.arrivalTime = moment(time);
     this.dataM.currentHours = this.dataM.currentDate.hours();
     this.dataM.currentMinutes = this.dataM.currentDate.minutes();
@@ -68,11 +70,11 @@ export class CalcPageComponent {
     return value;
   }
 
-  private makeCorrectDateFromTime(time: ITime): Date {
+  private makeCorrectDateFromTime(time: ITime, today: Date): Date {
     if (time.hours.length === 2 && time.minutes.length === 2) {
-      const day = this.formatDayMonth(this.today.getDate().toString());
-      const month = this.formatDayMonth((this.today.getMonth() + 1).toString());
-      const year = this.today.getFullYear().toString();
+      const day = this.formatDayMonth(today.getDate().toString());
+      const month = this.formatDayMonth((today.getMonth() + 1).toString());
+      const year = today.getFullYear().toString();
 
       return new Date(`${year}-${month}-${day}T${time.hours}:${time.minutes}:00+03:00`);
     }
@@ -80,8 +82,18 @@ export class CalcPageComponent {
 
   public calculatePrice(time: ITime): void {
     this.minutesCounted = null;
-    this.arrivalTime = this.makeCorrectDateFromTime(time);
-    if (this.arrivalTime && this.arrivalTime.getTime() > this.today.getTime()) {
+    this.arrivalTime = this.makeCorrectDateFromTime(time, this.today);
+
+    if (this.arrivalTime && this.today.getHours() < 6 &&
+       (!this.isWeekend() || (this.isWeekend() && +time.hours > 8))) {
+      const today = new Date();
+      today.setDate(today.getDate() - 1);
+      this.arrivalTime = this.makeCorrectDateFromTime(time, today);
+    } else if (this.arrivalTime && this.today.getHours() < 6 && this.isWeekend() && +time.hours < 4) {
+      // TODO
+    }
+    if (this.arrivalTime && this.arrivalTime.getTime() > this.today.getTime() &&
+        this.arrivalTime.getDay() === this.today.getDay() ) {
       console.warn('You should enter time before now');
     } else if (this.arrivalTime) {
       this.totalPrice = null;
@@ -91,78 +103,158 @@ export class CalcPageComponent {
   }
 
   private getMinutesFromTime(arrivalTime: Date): number {
-    let pastMinutes: number;
     this.makeDataForMinutes(arrivalTime);
 
     if ((!this.isAfterCloseWeekday(this.dataM.currentHours, this.dataM.currentMinutes) && !this.isWeekend()) ||
-       (!this.isAfterCloseWeekend(this.dataM.currentHours, this.dataM.currentMinutes) && this.isWeekend())) {
-      pastMinutes =  this.dataM.currentDate.diff(this.dataM.newTime, 'minutes');
+        (!this.isAfterCloseWeekend(this.dataM.currentHours, this.dataM.currentMinutes) && this.isWeekend())) {
+      return this.dataM.currentDate.diff(this.dataM.newTime, 'minutes');
     } else if (this.isAfterCloseWeekday(this.dataM.currentHours, this.dataM.currentMinutes)) {
-      const totalMinutesBefore = (24 - this.dataM.arrivalHours) * 60 - this.dataM.arrivalMinutes;
-      const totalMinutesAfter = this.dataM.currentHours * 60 + this.dataM.currentMinutes;
-      pastMinutes =  totalMinutesBefore + totalMinutesAfter;
+      return this.minutesBeforeTime(this.dataM.arrivalHours, this.dataM.arrivalMinutes, 24) + this.minutesAfterTime(this.dataM.currentHours, this.dataM.currentMinutes);
     } else if (this.isAfterCloseWeekend(this.dataM.currentHours, this.dataM.currentMinutes)) {
       if (this.dataM.arrivalHours >= 0 && this.dataM.arrivalHours < 3) {
-        pastMinutes = (this.dataM.currentHours - this.dataM.arrivalHours) * 60 + this.dataM.currentMinutes - this.dataM.arrivalMinutes;
+        return (this.dataM.currentHours - this.dataM.arrivalHours) * 60 + this.dataM.currentMinutes - this.dataM.arrivalMinutes;
       } else {
-        const totalMinutesBefore = (24 - this.dataM.arrivalHours) * 60 - this.dataM.arrivalMinutes;
-        const totalMinutesAfter = this.dataM.currentHours * 60 + this.dataM.currentMinutes;
-        pastMinutes = totalMinutesBefore + totalMinutesAfter;
+        return this.minutesBeforeTime(this.dataM.arrivalHours, this.dataM.arrivalMinutes, 24) + this.minutesAfterTime(this.dataM.currentHours, this.dataM.currentMinutes);
       }
     }
-
-    return pastMinutes;
   }
 
   private getPrice(arrivalTime: Date): number {
     this.today = new Date();
     // this.today = new Date('Fri Jul 24 2020 22:00:00 GMT+0300');
+    // this.today = new Date('Sun Jul 26 2020 03:10:00 GMT+0300');
+    // this.today = new Date('Mon Jul 27 2020 00:20:00 GMT+0300');
     this.makeDataForPrice(arrivalTime);
 
     if (!this.isAfterCLose(this.dataP.currentHours, this.dataP.currentMinutes)) {
       if (this.isWeekend() || this.isHoliday() || this.dataP.arrivalTime.isAfter(CROSS_TIME)) {
-        const result = +this.dataP.minutesPast * 3;
+        const result = +this.dataP.minutesPast * PRICE_WEEKEND;
 
         return result >= MAX_PRICE ? MAX_PRICE : result;
       } else if (this.dataP.currentDate.isBefore(CROSS_TIME) && !this.isWeekend() && !this.isHoliday()) {
-        const result = +this.dataP.minutesPast * 2.5;
+        const result = +this.dataP.minutesPast * PRICE;
 
         return result >= MAX_PRICE ? MAX_PRICE : result;
       } else {
-        const totalMinutesBefore = (19 - this.dataP.arrivalHours) * 60 - this.dataP.arrivalMinutes;
-        const totalMinutesAfter = (this.dataP.currentHours - 19) * 60 + this.dataP.currentMinutes;
-        const result = totalMinutesBefore * 2.5 + totalMinutesAfter * 3;
+        const result = this.minutesBeforeTime(this.dataP.arrivalHours, this.dataP.arrivalMinutes, 19) * PRICE +
+                       this.minutesAfterTime(this.dataP.currentHours, this.dataP.currentMinutes, 19) * PRICE_WEEKEND;
 
         return result >= MAX_PRICE ? MAX_PRICE : result;
       }
     } else if (this.isAfterCloseWeekday(this.dataP.currentHours, this.dataP.currentMinutes) &&
               !this.isAfterCloseWeekend(this.dataP.currentHours, this.dataP.currentMinutes)) {
-      const totalMinutesBefore = ((24 - this.dataP.arrivalHours) * 60 - this.dataP.arrivalMinutes);
-      let priceBefore = totalMinutesBefore * 3;
+      let priceBefore = this.minutesBeforeTime(this.dataP.arrivalHours, this.dataP.arrivalMinutes, 24) * PRICE_WEEKEND;
       priceBefore = priceBefore >= MAX_PRICE ? MAX_PRICE : priceBefore;
-      const totalMinutesAfter = (this.dataP.currentHours * 60 + this.dataP.currentMinutes);
-      const priceAfter = totalMinutesAfter * 3;
+      const priceAfter = this.minutesAfterTime(this.dataP.currentHours, this.dataP.currentMinutes) * PRICE_WEEKEND;
 
       return priceBefore + priceAfter;
     } else if (this.isAfterCloseWeekend(this.dataP.currentHours, this.dataP.currentMinutes)) {
       if (this.dataP.arrivalHours >= 0 && this.dataP.arrivalHours < 3) {
-        const totalMinutesBefore = (3 - this.dataP.arrivalHours) * 60 + this.dataP.currentMinutes - this.dataP.arrivalMinutes;
-        let priceBefore = totalMinutesBefore * 3;
+        const totalMinutesBefore =
+          (3 - this.dataP.arrivalHours) * 60 + this.dataP.currentMinutes - this.dataP.arrivalMinutes;
+        let priceBefore = totalMinutesBefore * PRICE_WEEKEND;
         priceBefore = priceBefore >= MAX_PRICE ? MAX_PRICE : priceBefore;
-        const totalMinutesAfter = (this.dataP.currentHours - this.dataP.arrivalHours) * 60 + this.dataP.currentMinutes - this.dataP.arrivalMinutes - totalMinutesBefore;
-        const priceAfter = totalMinutesAfter * 3;
-
+        const totalMinutesAfter =
+          (this.dataP.currentHours - this.dataP.arrivalHours) * 60 + this.dataP.currentMinutes - this.dataP.arrivalMinutes - totalMinutesBefore;
+        const priceAfter = totalMinutesAfter * PRICE_WEEKEND;
         return priceBefore + priceAfter;
       } else {
-        const totalMinutesBefore = (24 - this.dataP.arrivalHours) * 60 - this.dataP.arrivalMinutes + 3 * 60;
-        let priceBefore = totalMinutesBefore * 3;
+        let priceBefore = (this.minutesBeforeTime(this.dataP.arrivalHours, this.dataP.arrivalMinutes, 24) + 3 * 60) * PRICE_WEEKEND;
         priceBefore = priceBefore >= MAX_PRICE ? MAX_PRICE : priceBefore;
-        const totalMinutesAfter = (this.dataP.currentHours - 3) * 60 + this.dataP.currentMinutes;
-        const priceAfter = totalMinutesAfter * 3;
+        const priceAfter = this.minutesAfterTime(this.dataP.currentHours, this.dataP.currentMinutes, 3) * PRICE_WEEKEND;
 
         return priceBefore + priceAfter;
       }
     }
+  }
+
+  public subtract(minutes: string): void {
+    const minutesPast = this.getMinutesFromTime(this.arrivalTime);
+    let newArrivalTime: any;
+
+    if (!this.isAfterCloseWeekday(this.dataP.currentHours, this.dataP.currentMinutes) &&
+        !this.isAfterCloseWeekend(this.dataP.currentHours, this.dataP.currentMinutes)) {
+      if (this.isWeekend() || this.isHoliday() || this.dataP.arrivalTime.isAfter(CROSS_TIME)) {
+        const result = +minutesPast * PRICE_WEEKEND;
+        if (result > MAX_PRICE) {
+          this.minutesCounted = +minutesPast - ((result - MAX_PRICE) / PRICE_WEEKEND);
+          newArrivalTime = this.makeNewArrivalTime(this.minutesCounted);
+          newArrivalTime = moment(newArrivalTime).add(minutes, 'minutes');
+        } else {
+          newArrivalTime = moment(this.arrivalTime).add(minutes, 'minutes');
+        }
+      } else if (this.dataP.currentDate.isBefore(CROSS_TIME) && !this.isWeekend() && !this.isHoliday()) {
+        const result = +minutesPast * PRICE;
+        if (result > MAX_PRICE) {
+          this.minutesCounted = +minutesPast - ((result - MAX_PRICE) / PRICE);
+          newArrivalTime = this.makeNewArrivalTime(this.minutesCounted);
+          newArrivalTime = moment(newArrivalTime).add(minutes, 'minutes');
+        } else {
+          newArrivalTime = moment(this.arrivalTime).add(minutes, 'minutes');
+        }
+      } else {
+        let totalMinutesBefore = this.minutesBeforeTime(this.dataP.arrivalHours, this.dataP.arrivalHours, 19);
+        let totalMinutesAfter = this.minutesAfterTime(this.dataP.currentHours, this.dataP.currentMinutes, 19);
+        let result = totalMinutesBefore * PRICE + totalMinutesAfter * PRICE_WEEKEND;
+
+        if (totalMinutesBefore * PRICE > MAX_PRICE) {
+          totalMinutesBefore = totalMinutesBefore - ((totalMinutesBefore * PRICE - MAX_PRICE) / PRICE);
+          this.minutesCounted = totalMinutesBefore + totalMinutesAfter;
+        }
+        result = totalMinutesBefore * PRICE + totalMinutesAfter * PRICE_WEEKEND;
+
+        if (result > MAX_PRICE) {
+          if (totalMinutesAfter * PRICE_WEEKEND > MAX_PRICE) {
+            totalMinutesAfter = totalMinutesAfter - ((totalMinutesAfter * PRICE_WEEKEND - MAX_PRICE) / PRICE_WEEKEND);
+            this.minutesCounted = totalMinutesBefore + totalMinutesAfter;
+          }
+          result = totalMinutesBefore * PRICE + totalMinutesAfter * PRICE_WEEKEND;
+        }
+
+        if (result > MAX_PRICE) {
+          for (let res = result; result >= MAX_PRICE; res--) {
+            totalMinutesBefore -= 1;
+            result = totalMinutesBefore * PRICE + totalMinutesAfter * PRICE_WEEKEND;
+            if (totalMinutesBefore <= 0) { break; }
+          }
+
+          if (result > MAX_PRICE) {
+            for (let res = result; result >= MAX_PRICE; res--) {
+              totalMinutesAfter -=  1;
+              result = totalMinutesBefore * PRICE + totalMinutesAfter * PRICE_WEEKEND;
+              if (totalMinutesAfter <= 0) { break; }
+            }
+          }
+        }
+
+        this.minutesCounted = totalMinutesBefore + totalMinutesAfter;
+        newArrivalTime = this.makeNewArrivalTime(this.minutesCounted);
+        newArrivalTime = moment(newArrivalTime).add(minutes, 'minutes');
+      }
+    } else if (this.isAfterCloseWeekday(this.dataP.currentHours, this.dataP.currentMinutes) &&
+              !this.isAfterCloseWeekend(this.dataP.currentHours, this.dataP.currentMinutes)) {
+      // TODO
+    } else if (this.isAfterCloseWeekend(this.dataP.currentHours, this.dataP.currentMinutes)) {
+      // TODO
+    }
+
+    this.arrivalTime = new Date(newArrivalTime.format());
+    this.minutesPast = this.minutesPast - +minutes;
+    if (this.minutesCounted) {
+      this.minutesCounted = this.minutesCounted - +minutes;
+    }
+    this.price = this.getPrice(newArrivalTime.toDate());
+  }
+
+  private minutesBeforeTime(arrivalHours: number, arrivalMinutes: number, crossHour: number): number {
+    return (crossHour - arrivalHours) * 60 - arrivalMinutes;
+  }
+
+  private minutesAfterTime(currentHours: number, currentMinutes: number, crossHour?: number): number {
+    if (crossHour) {
+      return (currentHours - crossHour) * 60 + currentMinutes;
+    }
+    return currentHours * 60 + currentMinutes;
   }
 
   private isWeekend(): boolean {
@@ -181,7 +273,7 @@ export class CalcPageComponent {
 
   private isAfterCloseWeekday(currentHours: number, currentMinutes: number): boolean {
     if (((currentHours === 0 && currentMinutes !== 0) ||
-         (currentHours > 0 && currentHours < 6)) &&
+         (currentHours > 0 && currentHours < 7)) &&
          !this.isWeekend()) {
       return true;
     }
@@ -197,116 +289,21 @@ export class CalcPageComponent {
     return false;
   }
 
+  private makeNewArrivalTime(substractMinutes) {
+    return moment(this.today).subtract(substractMinutes, 'minutes').toDate();
+  }
+
+  public round(value: number): number {
+    if (value < 0) { return 0 };
+    return Math.floor(value);
+  }
+
   public multiply(times: number, price: number): void {
     this.totalPrice = times * price;
   }
 
   public clearInput(): void {
     this.dm.nativeElement.value = '';
-  }
-
-  public subtract(minutes: string): void {
-    const minutesPast = this.getMinutesFromTime(this.arrivalTime);
-    let newArrivalTime: any;
-
-    if (!this.isAfterCloseWeekday(this.dataP.currentHours, this.dataP.currentMinutes) &&
-        !this.isAfterCloseWeekend(this.dataP.currentHours, this.dataP.currentMinutes)) {
-      if (this.isWeekend() || this.isHoliday() || this.dataP.arrivalTime.isAfter(CROSS_TIME)) {
-        const result = +minutesPast * 3;
-        if (result > MAX_PRICE) {
-          this.minutesCounted = +minutesPast - ((result - MAX_PRICE) / 3);
-          newArrivalTime = this.makeNewArrivalTime(this.minutesCounted);
-          newArrivalTime = moment(newArrivalTime).add(minutes, 'minutes');
-        } else {
-          newArrivalTime = moment(this.arrivalTime).add(minutes, 'minutes');
-        }
-      } else if (this.dataP.currentDate.isBefore(CROSS_TIME) && !this.isWeekend() && !this.isHoliday()) {
-        const result = +minutesPast * 2.5;
-        if (result > MAX_PRICE) {
-          this.minutesCounted = +minutesPast - ((result - MAX_PRICE) / 2.5);
-          newArrivalTime = this.makeNewArrivalTime(this.minutesCounted);
-          newArrivalTime = moment(newArrivalTime).add(minutes, 'minutes');
-        } else {
-          newArrivalTime = moment(this.arrivalTime).add(minutes, 'minutes');
-        }
-      } else {
-        let totalMinutesBefore = (19 - this.dataP.arrivalHours) * 60 - this.dataP.arrivalMinutes;
-        let totalMinutesAfter = (this.dataP.currentHours - 19) * 60 + this.dataP.currentMinutes;
-        let result = totalMinutesBefore * 2.5 + totalMinutesAfter * 3;
-
-        if (totalMinutesBefore * 2.5 > MAX_PRICE) {
-          totalMinutesBefore = totalMinutesBefore - ((totalMinutesBefore * 2.5 - MAX_PRICE) / 2.5);
-          this.minutesCounted = totalMinutesBefore + totalMinutesAfter;
-        }
-        result = totalMinutesBefore * 2.5 + totalMinutesAfter * 3;
-
-        if (result > MAX_PRICE) {
-          if (totalMinutesAfter * 3 > MAX_PRICE) {
-            totalMinutesAfter = totalMinutesAfter - ((totalMinutesAfter * 3 - MAX_PRICE) / 3);
-            this.minutesCounted = totalMinutesBefore + totalMinutesAfter;
-          }
-          result = totalMinutesBefore * 2.5 + totalMinutesAfter * 3;
-        }
-
-        if (result > MAX_PRICE) {
-          for (let res = result; result >= MAX_PRICE; res--) {
-            totalMinutesBefore = totalMinutesBefore - 1;
-            result = totalMinutesBefore * 2.5 + totalMinutesAfter * 3;
-            if (totalMinutesBefore <= 0) { break; }
-          }
-
-          if (result > MAX_PRICE) {
-            for (let res = result; result >= MAX_PRICE; res--) {
-              totalMinutesAfter = totalMinutesAfter - 1;
-              result = totalMinutesBefore * 2.5 + totalMinutesAfter * 3;
-              if (totalMinutesAfter <= 0) { break; }
-            }
-          }
-        }
-
-        this.minutesCounted = totalMinutesBefore + totalMinutesAfter;
-        newArrivalTime = this.makeNewArrivalTime(this.minutesCounted);
-        newArrivalTime = moment(newArrivalTime).add(minutes, 'minutes');
-      }
-    } else if (this.isAfterCloseWeekday(this.dataP.currentHours, this.dataP.currentMinutes) &&
-              !this.isAfterCloseWeekend(this.dataP.currentHours, this.dataP.currentMinutes)) {
-      // const totalMinutesBefore = ((24 - this.arrivalHoursP) * 60 - this.arrivalMinutesP);
-      // let priceBefore = totalMinutesBefore * 3;
-      // const totalMinutesAfter = (this.currentHoursP * 60 + this.currentMinutesP);
-      // const priceAfter = totalMinutesAfter * 3;
-
-
-    } else if (this.isAfterCloseWeekend(this.dataP.currentHours, this.dataP.currentMinutes)) {
-      // if (this.arrivalHoursP >= 0 && this.arrivalHoursP < 3) {
-      //   const totalMinutesBefore = (3 - this.arrivalHoursP) * 60 + this.currentMinutesP - this.arrivalMinutesP;
-      //   let priceBefore = totalMinutesBefore * 3;
-
-      //   const totalMinutesAfter = (this.currentHoursP - this.arrivalHoursP) * 60 + this.currentMinutesP - this.arrivalMinutesP - totalMinutesBefore;
-      //   const priceAfter = totalMinutesAfter * 3;
-
-      // } else {
-      //   const totalMinutesBefore = (24 - this.arrivalHoursP) * 60 - this.arrivalMinutesP + 3 * 60;
-      //   let priceBefore = totalMinutesBefore * 3;
-      //   const totalMinutesAfter = (this.hoursNowP - 3) * 60 + this.currentMinutesP;
-      //   const priceAfter = totalMinutesAfter * 3;
-
-      // }
-    }
-
-    this.arrivalTime = new Date(newArrivalTime.format());
-    this.minutesPast = this.minutesPast - +minutes;
-    if (this.minutesCounted) {
-      this.minutesCounted = this.minutesCounted - +minutes;
-    }
-    this.price = this.getPrice(newArrivalTime.toDate());
-  }
-
-  private makeNewArrivalTime(substractMinutes) {
-    return moment(this.today).subtract(substractMinutes, 'minutes').toDate();
-  }
-
-  public round(number): number {
-    return Math.floor(number);
   }
 
 }
