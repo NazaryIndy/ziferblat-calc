@@ -18,6 +18,6 @@ export interface IPriceData extends IData {
 }
 
 export interface ITime {
-  hours: string,
+  hours: string;
   minutes: string;
 }
