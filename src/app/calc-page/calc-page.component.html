@@ -4,7 +4,7 @@
     <div class="timepicker-wrapper">
       <div class="container">
         <div class="group">
-          <app-timepicker (changed)="calcPrice($event)" class="timepicker" #tp>
+          <app-timepicker (changed)="calculatePrice($event)" class="timepicker" #tp>
           </app-timepicker>
         </div>
     </div>
@@ -14,15 +14,15 @@
         <span class="alert alert-secondary left" role="alert"> Прошло минут:</span>
         <span class="alert alert-success right" role="alert">{{ round(minutesPast) || "00" }}</span>
       </div>
-      <div class="alert-wrapper" *ngIf="newMinutesPast">
-        <span class="alert alert-secondary left" role="alert"> Со стоп чеком</span>
-        <span class="alert alert-success right" role="alert">{{ round(newMinutesPast) || "00" }}</span>
+      <div class="alert-wrapper" *ngIf="minutesCounted">
+        <span class="alert alert-secondary left" role="alert"> Со стоп чеком:</span>
+        <span class="alert alert-success right" role="alert">{{ round(minutesCounted) || "00" }}</span>
       </div>
       <div class="alert-wrapper">
         <div class="input-group mb-3">
           <input type="tel"
-                 [(ngModel)]="subtractMinutes"
-                 #subMinutes
+                 [(ngModel)]="deducatedMinutes"
+                 #deducated
                  class="form-control"
                  (blur)="clearInput()"
                  placeholder="Счастливые минутки"
@@ -32,7 +32,7 @@
             <button class="btn btn-outline-secondary"
                     type="button"
                     id="button-addon2"
-                    (click)="subtract(subtractMinutes)">Вычесть</button>
+                    (click)="subtract(deducatedMinutes)">Вычесть</button>
           </div>
         </div>
       </div>
@@ -42,7 +42,7 @@
       </div>
       <div *ngIf="finalPrice" class="alert-wrapper">
         <pre class="alert alert-info left" role="alert">Оплатить за всех:</pre>
-        <pre class="alert alert-info right" role="alert">{{ round(finalPrice) }}</pre>
+        <pre class="alert alert-info right" role="alert">{{ round(totalPrice) }}</pre>
       </div>
     </div>
   </div>
