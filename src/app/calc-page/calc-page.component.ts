@@ -83,7 +83,8 @@ export class CalcPageComponent {
   public calculatePrice(time: ITime): void {
     this.minutesCounted = null;
     this.arrivalTime = this.makeCorrectDateFromTime(time, this.today);
-
+    console.log('this.arrivalTime', this.arrivalTime)
+    console.log('this.today', this.today)
     if (this.arrivalTime && this.today.getHours() < 6 &&
        (!this.isWeekend() || (this.isWeekend() && +time.hours > 8))) {
       const today = new Date();
