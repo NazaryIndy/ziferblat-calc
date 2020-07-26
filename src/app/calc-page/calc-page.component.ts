@@ -114,13 +114,8 @@ export class CalcPageComponent {
 
       return totalMinutesBefore + totalMinutesAfter;
     } else if (!this.isAfterCloseWeekday(this.hoursNowG, this.minutesNowG) && this.isWeekend()) {
-      if (this.hoursCameG >= 0 && this.hoursCameG < 3) {
-        return (this.hoursNowG - this.hoursCameG) * 60 + this.minutesNowG - this.minutesCameG;
-      }
-      const totalMinutesBefore = (24 - this.hoursCameG) * 60 - this.minutesCameG;
-      const totalMinutesAfter = this.hoursNowG * 60 + this.minutesNowG;
 
-      return totalMinutesBefore + totalMinutesAfter;
+      return now.diff(this.newTimeG, 'minutes');
     } else if (this.isAfterCloseWeekday(this.hoursNowG, this.minutesNowG)) {
       let todayMinutes: number;
       if (this.hoursCameG >= 0 && this.hoursCameG < 3) {
