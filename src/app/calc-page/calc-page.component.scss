@@ -37,12 +37,17 @@
   display: flex;
   justify-content: space-between;
   margin-bottom: 20px;
+
+  @media (max-width: 414px) {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
 }
 
 .multiply{
   position: relative;
   padding-left: 18px;
-  margin: 0 4px;
+  margin: 5px 4px;
 }
 
 .multiply:before,.multiply:after{
