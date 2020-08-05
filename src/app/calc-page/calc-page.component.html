@@ -6,6 +6,7 @@
         <div class="group">
           <app-timepicker (changed)="calculatePrice($event)" class="timepicker" #tp>
           </app-timepicker>
+          <button type="button" class="btn btn-danger btn-x" (click)="clear()">X</button>
         </div>
     </div>
     </div>
@@ -41,7 +42,7 @@
         <span class="alert alert-success right" role="alert">{{ round(price) || "00" }}</span>
       </div>
       <div *ngIf="totalPrice" class="alert-wrapper">
-        <pre class="alert alert-info left" role="alert">Оплатить за всех:</pre>
+        <pre class="alert alert-info left" role="alert">За всех:</pre>
         <pre class="alert alert-info right" role="alert">{{ round(totalPrice) }}</pre>
       </div>
     </div>
