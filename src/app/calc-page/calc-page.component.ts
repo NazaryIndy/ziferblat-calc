@@ -15,6 +15,8 @@ export class CalcPageComponent {
   @ViewChild('tp') tp: TimepickerComponent;
   @ViewChild('deducated') dm: ElementRef;
 
+  public isWrongTime: boolean;
+
   public arrivalTime: Date;
   public deducatedMinutes: string;
   public price: number;
@@ -56,6 +58,7 @@ export class CalcPageComponent {
     this.minutesPast = null;
     this.minutesCounted = null;
     this.deducatedMinutes = null;
+    this.isWrongTime = false;
     this.tp.buildForm();
   }
 
@@ -77,6 +80,7 @@ export class CalcPageComponent {
   }
 
   public calculatePrice(time: ITime): void {
+    this.isWrongTime = false;
     this.minutesCounted = null;
     this.arrivalTime = this.makeCorrectDateFromTime(time, this.today);
 
@@ -90,6 +94,7 @@ export class CalcPageComponent {
     }
     if (this.arrivalTime && this.arrivalTime.getTime() > this.today.getTime() &&
         this.arrivalTime.getDay() === this.today.getDay() ) {
+      this.isWrongTime = true;
       console.warn('You should enter time before now');
     } else if (this.arrivalTime) {
       this.totalPrice = null;
@@ -104,7 +109,8 @@ export class CalcPageComponent {
     if ((!this.isAfterClose(this.dataM.currentHours, this.dataM.currentMinutes))) {
       return this.dataM.currentDate.diff(this.dataM.newTime, 'minutes');
     } else if (this.isAfterClose(this.dataM.currentHours, this.dataM.currentMinutes)) {
-      return this.minutesBeforeTime(this.dataM.arrivalHours, this.dataM.arrivalMinutes, 24) + this.minutesAfterTime(this.dataM.currentHours, this.dataM.currentMinutes);
+      return this.minutesBeforeTime(this.dataM.arrivalHours, this.dataM.arrivalMinutes, 24) +
+             this.minutesAfterTime(this.dataM.currentHours, this.dataM.currentMinutes);
     }
   }
 
@@ -243,7 +249,7 @@ export class CalcPageComponent {
   }
 
   public round(value: number): number {
-    if (value < 0) { return 0 };
+    if (value < 0) { return 0; }
     return Math.floor(value);
   }
 

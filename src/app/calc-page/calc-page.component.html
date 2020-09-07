@@ -9,6 +9,7 @@
           <button type="button" class="btn btn-danger btn-x" (click)="clear()">X</button>
         </div>
     </div>
+    <p *ngIf="isWrongTime" class="text-danger">Время введено некорректно!</p>
     </div>
     <div class="info-wrapper">
       <div class="alert-wrapper">
